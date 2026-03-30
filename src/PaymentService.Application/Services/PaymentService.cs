@@ -153,7 +153,7 @@ public class PaymentService : IPaymentService
             Data = new PaymentStatusUpdatedData
             {
                 BookingId = invoice.BookingId,
-                InvoiceId = invoice.Id,
+                PaymentId = invoice.Id,
                 Amount = invoice.TotalAmount,
                 Status = invoice.Status.ToString()
             }
