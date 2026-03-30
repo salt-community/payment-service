@@ -23,12 +23,10 @@ public class InvoiceRepository(PaymentDbContext db) : IInvoiceRepository
             .Include(x => x.Lines)
             .FirstOrDefaultAsync(x => x.Id == invoiceId, ct);
     }
-    public async Task<Invoice> AddAsync(Invoice invoice, CancellationToken ct = default)
+    public async Task AddAsync(Invoice invoice, CancellationToken ct = default)
     {
         await db.Invoices.AddAsync(invoice, ct);
         await db.SaveChangesAsync(ct);
-
-        return invoice;
     }
     public async Task UpdateAsync(Invoice invoice, CancellationToken ct = default)
     {
