@@ -61,7 +61,7 @@ public class PaymentService : IPaymentService
         {
             if (!existingLinesByName.TryGetValue(part.Name, out var existingLine))
             {
-                invoice.Lines.Add(new InvoiceLine
+                var newLine = new InvoiceLine
                 {
                     Id = Guid.NewGuid(),
                     InvoiceId = invoice.Id,
@@ -69,7 +69,10 @@ public class PaymentService : IPaymentService
                     UnitPrice = part.Price,
                     Amount = part.Amount,
                     ServiceType = message.ServiceType
-                });
+                };
+
+                invoice.Lines.Add(newLine);
+                existingLinesByName[part.Name] = newLine;
             }
             else
             {
