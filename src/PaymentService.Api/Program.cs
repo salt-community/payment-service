@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using PaymentService.Api.Endpoints;
+using PaymentService.Application.Interfaces;
+using PaymentService.Application.Services;
+using PaymentService.Infrastructure.Kafka;
 using PaymentService.Infrastructure.Persistence;
+using PaymentService.Infrastructure.Persistence.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +15,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<PaymentDbContext>(options =>
     options.UseNpgsql(connectionString));
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService.Application.Services.PaymentService>();
+
+builder.Services.AddSingleton<IPaymentEventProducer, PaymentEventProducer>();
+
 
 var app = builder.Build();
 
@@ -20,5 +30,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapPaymentEndPoints();
 
 app.Run();
