@@ -32,8 +32,8 @@ public class PaymentService : IPaymentService
         {
             Id = Guid.NewGuid(),
             BookingId = message.BookingId,
-            CustomerName = message.CustomerName,
-            CustomerEmail = message.CustomerEmail,
+            CustomerName = message.Customer.Name,
+            CustomerEmail = message.Customer.Email,
             Status = InvoiceStatus.Pending,
             TotalAmount = 0m,
             CreatedAt = DateTime.UtcNow,
