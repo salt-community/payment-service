@@ -35,7 +35,7 @@ public class PaymentService : IPaymentService
             CustomerName = message.CustomerName,
             CustomerEmail = message.CustomerEmail,
             Status = InvoiceStatus.Pending,
-            TotalAmount = 0,
+            TotalAmount = 0m,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -125,6 +125,36 @@ public class PaymentService : IPaymentService
             return;
 
         invoice.Status = InvoiceStatus.Paid;
+        invoice.UpdatedAt = DateTime.UtcNow;
+
+        await _invoiceRepository.UpdateAsync(invoice, cancellationToken);
+
+        var paymentEvent = new PaymentStatusUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            Timestamp = DateTime.UtcNow,
+            Data = new PaymentStatusUpdatedData
+            {
+                BookingId = invoice.BookingId,
+                InvoiceId = invoice.Id,
+                Amount = invoice.TotalAmount,
+                Status = invoice.Status.ToString()
+            }
+        };
+
+        await _eventProducer.PublishPaymentStatusUpdatedAsync(paymentEvent, cancellationToken);
+    }
+
+    public async Task MarkAsFailedAsync(
+    Guid invoiceId,
+    CancellationToken cancellationToken = default)
+    {
+        var invoice = await _invoiceRepository.GetByIdAsync(invoiceId, cancellationToken);
+
+        if (invoice == null)
+            return;
+
+        invoice.Status = InvoiceStatus.Failed;
         invoice.UpdatedAt = DateTime.UtcNow;
 
         await _invoiceRepository.UpdateAsync(invoice, cancellationToken);

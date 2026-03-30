@@ -8,4 +8,5 @@ public interface IPaymentService
     Task HandleWorkshopUpdatedAsync(WorkshopUpdatedEvent message, CancellationToken cancellationToken = default);
     Task HandleWorkshopCompletedAsync(WorkshopCompletedEvent message, CancellationToken cancellationToken = default);
     Task MarkAsPaidAsync(Guid invoiceId, CancellationToken cancellationToken = default);
+    Task MarkAsFailedAsync(Guid invoiceId, CancellationToken cancellationToken = default);
 }
