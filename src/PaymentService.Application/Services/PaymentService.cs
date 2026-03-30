@@ -53,25 +53,29 @@ public class PaymentService : IPaymentService
         if (invoice == null)
             return;
 
-        var existingLine = invoice.Lines
-            .FirstOrDefault(x => x.ServiceType == message.ServiceType && x.Name == message.Name);
+        var existingLinesByName = invoice.Lines
+            .Where(x => x.ServiceType == message.ServiceType)
+            .ToDictionary(x => x.Name, x => x);
 
-        if (existingLine == null)
+        foreach (var part in message.Parts)
         {
-            invoice.Lines.Add(new InvoiceLine
+            if (!existingLinesByName.TryGetValue(part.Name, out var existingLine))
             {
-                Id = Guid.NewGuid(),
-                InvoiceId = invoice.Id,
-                Name = message.Name,
-                UnitPrice = message.Price,
-                Amount = message.Amount,
-                ServiceType = message.ServiceType
-            });
-        }
-        else
-        {
-            existingLine.UnitPrice = message.Price;
-            existingLine.Amount = message.Amount;
+                invoice.Lines.Add(new InvoiceLine
+                {
+                    Id = Guid.NewGuid(),
+                    InvoiceId = invoice.Id,
+                    Name = part.Name,
+                    UnitPrice = part.Price,
+                    Amount = part.Amount,
+                    ServiceType = message.ServiceType
+                });
+            }
+            else
+            {
+                existingLine.UnitPrice = part.Price;
+                existingLine.Amount = part.Amount;
+            }
         }
 
         invoice.TotalAmount = invoice.Lines.Sum(x => x.UnitPrice * x.Amount);
