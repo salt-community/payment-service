@@ -94,6 +94,9 @@ public class PaymentService : IPaymentService
         if (invoice == null)
             return;
 
+        if (invoice.Status == InvoiceStatus.Invoiced)
+            return;
+
         invoice.Status = InvoiceStatus.Invoiced;
         invoice.UpdatedAt = DateTime.UtcNow;
 
