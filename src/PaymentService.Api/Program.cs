@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Confluent.Kafka;
 using PaymentService.Application.Interfaces;
 using PaymentService.Application.Services;
 using PaymentService.Infrastructure.Kafka;
@@ -15,6 +16,11 @@ builder.Services.AddDbContext<PaymentDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IPaymentService, PaymentService.Application.Services.PaymentService>();
+
+var kafkaSection = builder.Configuration.GetSection("Kafka");
+
+var producerConfig = kafkaSection.Get<ProducerConfig>();
+builder.Services.AddSingleton(producerConfig);
 
 builder.Services.AddSingleton<IPaymentEventProducer, PaymentEventProducer>();
 
