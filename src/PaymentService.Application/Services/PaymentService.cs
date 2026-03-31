@@ -161,4 +161,16 @@ public class PaymentService : IPaymentService
 
         await _eventProducer.PublishPaymentStatusUpdatedAsync(paymentEvent, cancellationToken);
     }
+
+    public async Task<Invoice?> GetInvoiceByIdAsync(
+        Guid invoiceId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _invoiceRepository.GetByIdAsync(invoiceId, cancellationToken);
+    }
+    public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _invoiceRepository.GetAllAsync(cancellationToken);
+    }
 }
