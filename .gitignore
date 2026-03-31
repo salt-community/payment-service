@@ -3,7 +3,7 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-# Certificates (Ignorerar dessa filer i ALLA mappar)
+# Certificates
 *.pem
 *.cert
 *.key

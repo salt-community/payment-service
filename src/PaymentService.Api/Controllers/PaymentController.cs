@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PaymentService.Application.Interfaces;
+using PaymentService.Domain.Entities;
 
 namespace PaymentService.Api.Controllers
 {
@@ -23,9 +24,24 @@ namespace PaymentService.Api.Controllers
             if (invoiceId == Guid.Empty)
                 return BadRequest("Invalid invoiceId");
             await _paymentService.MarkAsPaidAsync(invoiceId, ct);
-            return Ok("Payment processed Sucessfully");
+            return Ok("Payment processed successfully");
+        }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Invoice>>> GetInvoices(CancellationToken ct)
+        {
+            var invoices = await _paymentService.GetAllInvoicesAsync(ct);
+            return Ok(invoices);
+        }
+        [HttpGet("{invoiceId}")]
+        public async Task<ActionResult<Invoice>> GetInvoice(Guid invoiceId, CancellationToken ct)
+        {
+            var invoice = await _paymentService.GetInvoiceByIdAsync(invoiceId, ct);
+            if (invoice == null)
+                return NotFound("Invoice not found");
+            return Ok(invoice);
         }
 
     }
 
 }
+
