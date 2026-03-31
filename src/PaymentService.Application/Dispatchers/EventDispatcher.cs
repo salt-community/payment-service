@@ -1,16 +1,16 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using PaymentService.Application.Events;
+using PaymentService.Application.Interfaces;
 
 namespace PaymentService.Application.Dispatchers;
 
-public class EventDispatcher(IServiceScopeFactory scopeFactory) : IEventDispatcher
+public class EventDispatcher(IPaymentService paymentService) : IEventDispatcher
 {
     public async Task Dispatch(string topic, string json)
     {
         try
         {
-            using var scope = scopeFactory.CreateScope();
-
             using var doc = JsonDocument.Parse(json);
 
             if (!doc.RootElement.TryGetProperty("eventType", out var typeElement))
@@ -22,7 +22,9 @@ public class EventDispatcher(IServiceScopeFactory scopeFactory) : IEventDispatch
 
             if (topic == "booking" && type == "Created")
             {
-                Console.WriteLine("hejhej -----");
+                Console.WriteLine("Calling booking created service");
+                var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(doc);
+                await paymentService.HandleBookingCreatedAsync(bookingEvent);
             }
             else if (topic == "workshop")
             {
@@ -30,7 +32,7 @@ public class EventDispatcher(IServiceScopeFactory scopeFactory) : IEventDispatch
             }
             else
             {
-                Console.WriteLine("NOOOOOOO topic ahh");
+                Console.WriteLine("No topic found!");
             }
         }
         catch (Exception e)

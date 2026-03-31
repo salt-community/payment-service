@@ -9,23 +9,12 @@ namespace PaymentService.Infrastructure.Kafka;
 
 public class PaymentEventProducer : IPaymentEventProducer
 {
-    private readonly IConfiguration _config;
     private readonly IProducer<string, string> _producer;
 
-    public PaymentEventProducer(IConfiguration config)
+    public PaymentEventProducer(ProducerConfig config)
     {
-        _config = config;
 
-        var producerConfig = new ProducerConfig
-        {
-            BootstrapServers = _config["Kafka:BootstrapServers"],
-            SecurityProtocol = SecurityProtocol.Ssl,
-            SslCaLocation = "certs/ca.pem",
-            SslCertificateLocation = "certs/service.cert",
-            SslKeyLocation = "certs/service.key",
-            Acks = Acks.All
-        };
-        _producer = new ProducerBuilder<string, string>(producerConfig).Build();
+        _producer = new ProducerBuilder<string, string>(config).Build();
 
     }
 

@@ -3,11 +3,11 @@ using PaymentService.Application.Dispatchers;
 
 namespace PaymentService.Worker.Workers;
 
-public class EventConsumer(ConsumerConfig config, IServiceScopeFactory scopeFactory) : BackgroundService
+public class EventConsumer(ConsumerConfig consumerConfig, IServiceScopeFactory scopeFactory) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var consumer = new ConsumerBuilder<string, string>(config).Build();
+        using var consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
         consumer.Subscribe(new[] { "booking", "workshop" });
 
         try
