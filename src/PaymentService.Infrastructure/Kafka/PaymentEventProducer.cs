@@ -2,6 +2,7 @@ using System.Runtime;
 using System.Text.Json;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
+using PaymentService.Application.Events;
 using PaymentService.Application.Interfaces;
 
 namespace PaymentService.Infrastructure.Kafka;
@@ -27,26 +28,16 @@ public class PaymentEventProducer : IPaymentEventProducer
         _producer = new ProducerBuilder<string, string>(producerConfig).Build();
 
     }
-    public async Task PublishPaymentPaidEventAsync<T>(T message)
+
+    public Task PublishPaymentStatusUpdatedAsync(PaymentStatusUpdatedEvent paymentEvent, CancellationToken cancellationToken = default)
     {
-        var eventEnvelop = new
-        {
-            eventId = Guid.NewGuid(),
-            eventType = "payment.paid",
-            timestamp = DateTime.UtcNow,
-            data = message
-        };
-
-
-        var json = JsonSerializer.Serialize(eventEnvelop);
+        var json = JsonSerializer.Serialize(paymentEvent);
         var kafkaMessage = new Message<string, string>
         {
-            Key = Guid.NewGuid().ToString(),
+            Key = paymentEvent.EventId.ToString(),
             Value = json
         };
-        await _producer.ProduceAsync("payments", kafkaMessage);
-
-
+        return _producer.ProduceAsync("payments", kafkaMessage);
     }
 }
 

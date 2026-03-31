@@ -1,10 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using PaymentService.Api.Endpoints;
 using PaymentService.Application.Interfaces;
 using PaymentService.Application.Services;
 using PaymentService.Infrastructure.Kafka;
 using PaymentService.Infrastructure.Persistence;
-using PaymentService.Infrastructure.Persistence.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +28,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapPaymentEndPoints();
 
 app.Run();
