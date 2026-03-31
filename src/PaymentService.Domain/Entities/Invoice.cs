@@ -1,3 +1,6 @@
+using PaymentService.Domain.Enums;
+namespace PaymentService.Domain.Entities;
+
 public class Invoice
 {
     public Guid Id { get; set; }

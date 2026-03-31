@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using PaymentService.Domain.Entities;
+
 
 namespace PaymentService.Infrastructure.Persistence;
 

@@ -1,3 +1,5 @@
+namespace PaymentService.Domain.Entities;
+
 public class InvoiceLine
 {
     public Guid Id { get; set; }
