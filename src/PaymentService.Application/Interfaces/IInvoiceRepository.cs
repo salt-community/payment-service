@@ -9,4 +9,5 @@ public interface IInvoiceRepository
     Task AddAsync(Invoice invoice, CancellationToken cancellationToken = default);
     Task UpdateAsync(Invoice invoice, CancellationToken cancellationToken = default);
     Task<IEnumerable<Invoice>> GetAllAsync(CancellationToken cancellationToken = default);
+    void AddInvoiceLine(InvoiceLine line);
 }

@@ -37,4 +37,9 @@ public class InvoiceRepository(PaymentDbContext db) : IInvoiceRepository
     {
         return await db.Invoices.Include(x => x.Lines).ToListAsync(ct);
     }
+
+    public void AddInvoiceLine(InvoiceLine line)
+    {
+        db.InvoiceLines.Add(line);
+    }
 }
