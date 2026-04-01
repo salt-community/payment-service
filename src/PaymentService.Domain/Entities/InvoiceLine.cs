@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace PaymentService.Domain.Entities;
 
 public class InvoiceLine
@@ -13,7 +15,7 @@ public class InvoiceLine
     public decimal Amount { get; set; }
 
     public string ServiceType { get; set; } = string.Empty;
+
+    [JsonIgnore]
     public Invoice? Invoice { get; set; }
-
-
 }
