@@ -22,12 +22,25 @@ public class PaymentEventProducer : IPaymentEventProducer
     public async Task PublishPaymentStatusUpdatedAsync(PaymentStatusUpdatedEvent paymentEvent, CancellationToken cancellationToken = default)
     {
         var json = JsonSerializer.Serialize(paymentEvent);
+
+        Console.WriteLine("Publishing payment.status.updated");
+        Console.WriteLine($"BookingId: {paymentEvent.Data.BookingId}");
+        Console.WriteLine($"PaymentId: {paymentEvent.Data.PaymentId}");
+        Console.WriteLine($"Amount: {paymentEvent.Data.Amount}");
+        Console.WriteLine($"Status: {paymentEvent.Data.Status}");
+        Console.WriteLine($"Payload: {json}");
+
         var kafkaMessage = new Message<string, string>
         {
             Key = paymentEvent.EventId.ToString(),
             Value = json
         };
-        await _producer.ProduceAsync("payments", kafkaMessage);
+
+        var result = await _producer.ProduceAsync("payment.status.updated", kafkaMessage, cancellationToken);
+
+        Console.WriteLine($"Produced to topic: {result.Topic}");
+        Console.WriteLine($"Partition: {result.Partition}");
+        Console.WriteLine($"Offset: {result.Offset}");
     }
 }
 

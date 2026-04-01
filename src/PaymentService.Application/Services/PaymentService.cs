@@ -41,17 +41,30 @@ public class PaymentService : IPaymentService
         };
 
         await _invoiceRepository.AddAsync(invoice, cancellationToken);
+
+        await PublishPaymentStatusUpdatedAsync(invoice, cancellationToken);
     }
 
     public async Task HandleWorkshopUpdatedAsync(
         WorkshopUpdatedEvent message,
         CancellationToken cancellationToken = default)
     {
+
+        Console.WriteLine($"WorkshopUpdated BookingId: {message.BookingId}");
+        Console.WriteLine($"ServiceType: {message.ServiceType}");
+        Console.WriteLine($"Parts count: {message.Parts?.Count ?? 0}");
+
         var invoice = await _invoiceRepository
             .GetByBookingIdAsync(message.BookingId, cancellationToken);
 
         if (invoice == null)
             return;
+
+        if (message.Parts == null || message.Parts.Count == 0)
+        {
+            Console.WriteLine("No parts in workshop update");
+            return;
+        }
 
         var existingLinesByName = invoice.Lines
             .Where(x => x.ServiceType == message.ServiceType)
@@ -61,6 +74,8 @@ public class PaymentService : IPaymentService
         {
             if (!existingLinesByName.TryGetValue(part.Name, out var existingLine))
             {
+                Console.WriteLine($"Part Name: {part.Name}, Price: {part.Price}, Amount: {part.Amount}");
+
                 var newLine = new InvoiceLine
                 {
                     Id = Guid.NewGuid(),
@@ -72,6 +87,7 @@ public class PaymentService : IPaymentService
                 };
 
                 invoice.Lines.Add(newLine);
+                _invoiceRepository.AddInvoiceLine(newLine);
                 existingLinesByName[part.Name] = newLine;
             }
             else
@@ -83,6 +99,9 @@ public class PaymentService : IPaymentService
 
         invoice.TotalAmount = invoice.Lines.Sum(x => x.UnitPrice * x.Amount);
         invoice.UpdatedAt = DateTime.UtcNow;
+
+        Console.WriteLine($"Invoice lines before save: {invoice.Lines.Count}");
+        Console.WriteLine($"TotalAmount before save: {invoice.TotalAmount}");
 
         await _invoiceRepository.UpdateAsync(invoice, cancellationToken);
     }

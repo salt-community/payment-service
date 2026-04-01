@@ -10,6 +10,8 @@ public class EventConsumer(ConsumerConfig consumerConfig, IServiceScopeFactory s
         using var consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
         consumer.Subscribe(new[] { "booking", "workshop" });
 
+        Console.WriteLine("Worker started and waiting for Kafka messages...");
+
         try
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -17,6 +19,9 @@ public class EventConsumer(ConsumerConfig consumerConfig, IServiceScopeFactory s
                 try
                 {
                     var result = consumer.Consume(stoppingToken);
+
+                    Console.WriteLine($"Topic: {result.Topic}");
+                    Console.WriteLine($"Payload: {result.Message.Value}");
 
                     if (result != null)
                     {

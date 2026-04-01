@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using PaymentService.Application.Events;
 using PaymentService.Application.Interfaces;
 
@@ -11,29 +10,109 @@ public class EventDispatcher(IPaymentService paymentService) : IEventDispatcher
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                Console.WriteLine("Empty payload");
+                return;
+            }
+
             using var doc = JsonDocument.Parse(json);
 
-            if (!doc.RootElement.TryGetProperty("eventType", out var typeElement))
+            string? type = null;
+            if (doc.RootElement.TryGetProperty("eventType", out var typeElement))
             {
-                Console.WriteLine("No type found in Json");
+                type = typeElement.GetString()?.ToLowerInvariant();
             }
 
-            string type = typeElement.GetString();
+            if (topic == "booking")
+            {
+                if (type == "created")
+                {
+                    Console.WriteLine("Calling booking created service");
 
-            if (topic == "booking" && type == "Created")
-            {
-                Console.WriteLine("Calling booking created service");
-                var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(doc);
-                await paymentService.HandleBookingCreatedAsync(bookingEvent);
+                    var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                    if (bookingEvent == null)
+                    {
+                        Console.WriteLine("Failed to deserialize BookingCreatedEvent");
+                        return;
+                    }
+
+                    Console.WriteLine($"BookingCreated BookingId: {bookingEvent.BookingId}");
+                    Console.WriteLine($"CustomerName: {bookingEvent.Customer?.Name}");
+                    Console.WriteLine($"CustomerEmail: {bookingEvent.Customer?.Email}");
+
+                    await paymentService.HandleBookingCreatedAsync(bookingEvent);
+                    return;
+                }
+
+                Console.WriteLine($"No booking handler for eventType '{type}'");
+                return;
             }
-            else if (topic == "workshop")
+
+            if (topic == "workshop")
             {
-                Console.WriteLine("Should call workshop handlers");
+                if (type == "completed")
+                {
+                    Console.WriteLine("Calling workshop completed service");
+
+                    var completedEvent = JsonSerializer.Deserialize<WorkshopCompletedEvent>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                    if (completedEvent == null)
+                    {
+                        Console.WriteLine("Failed to deserialize WorkshopCompletedEvent");
+                        return;
+                    }
+
+                    await paymentService.HandleWorkshopCompletedAsync(completedEvent);
+                    return;
+                }
+
+                var isUpdate =
+                    type == "update" ||
+                    doc.RootElement.TryGetProperty("ServiceType", out _) ||
+                    doc.RootElement.TryGetProperty("Parts", out _);
+
+                if (isUpdate)
+                {
+                    Console.WriteLine("Calling workshop updated service");
+
+                    var updateEvent = JsonSerializer.Deserialize<WorkshopUpdatedEvent>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                    if (updateEvent == null)
+                    {
+                        Console.WriteLine("Failed to deserialize WorkshopUpdatedEvent");
+                        return;
+                    }
+
+                    Console.WriteLine($"WorkshopUpdated BookingId: {updateEvent.BookingId}");
+                    Console.WriteLine($"ServiceType: {updateEvent.ServiceType}");
+                    Console.WriteLine($"Parts count: {updateEvent.Parts?.Count ?? 0}");
+
+                    await paymentService.HandleWorkshopUpdatedAsync(updateEvent);
+                    return;
+                }
+
+                Console.WriteLine($"No workshop handler for eventType '{type}'");
+                return;
             }
-            else
-            {
-                Console.WriteLine("No topic found!");
-            }
+
+            Console.WriteLine($"No handler for topic '{topic}'");
         }
         catch (Exception e)
         {
