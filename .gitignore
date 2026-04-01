@@ -489,3 +489,16 @@ $RECYCLE.BIN/
 *.swp
 
 certs/
+
+# Node / Frontend
+node_modules/
+.vite/
+dist/
+dist-ssr/
+*.local
+
+# Playwright / Testing
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
