@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 14% 96%;
+    --foreground: 220 20% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 14%;
+
+    --primary: 216 60% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 90%;
+    --secondary-foreground: 220 20% 14%;
+
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 220 14% 88%;
+    --accent-foreground: 220 20% 14%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 80%;
+    --input: 220 13% 80%;
+    --ring: 216 60% 45%;
+
+    --radius: 0.25rem;
+
+    --win-highlight: 0 0% 100%;
+    --win-shadow: 220 10% 58%;
+    --win-panel: 220 14% 94%;
+    --win-titlebar: 216 60% 45%;
+
+    --status-paid: 142 50% 40%;
+    --status-paid-foreground: 0 0% 100%;
+    --status-pending: 38 80% 50%;
+    --status-pending-foreground: 0 0% 100%;
+    --status-failed: 0 72% 51%;
+    --status-failed-foreground: 0 0% 100%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+}
+
+@layer utilities {
+  .win-panel {
+    @apply bg-card border border-border;
+    box-shadow: inset 1px 1px 0 hsl(var(--win-highlight)),
+                inset -1px -1px 0 hsl(var(--win-shadow)),
+                2px 2px 4px hsl(220 10% 58% / 0.15);
+  }
+
+  .win-panel-inset {
+    @apply bg-background border border-border;
+    box-shadow: inset 1px 1px 0 hsl(var(--win-shadow) / 0.3),
+                inset -1px -1px 0 hsl(var(--win-highlight));
+  }
+
+  .win-titlebar {
+    background: linear-gradient(90deg, hsl(216 60% 45%), hsl(216 60% 60%));
+    @apply text-primary-foreground px-3 py-1.5 text-sm font-semibold;
+  }
+}

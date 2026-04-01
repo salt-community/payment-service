@@ -1,0 +1,75 @@
+import { Invoice } from "./types";
+
+export const mockInvoices: Invoice[] = [
+  {
+    id: "INV-001",
+    bookingId: "BK-2024-001",
+    customerName: "Alice Johnson",
+    customerEmail: "alice@example.com",
+    totalAmount: 350.00,
+    status: "Paid",
+    createdAt: "2024-11-15T10:30:00Z",
+    updatedAt: "2024-11-16T14:00:00Z",
+    lines: [
+      { id: "L1", name: "Standard Room", serviceType: "Accommodation", unitPrice: 120, amount: 2, lineTotal: 240 },
+      { id: "L2", name: "Breakfast Buffet", serviceType: "Dining", unitPrice: 25, amount: 2, lineTotal: 50 },
+      { id: "L3", name: "Airport Transfer", serviceType: "Transport", unitPrice: 60, amount: 1, lineTotal: 60 },
+    ],
+  },
+  {
+    id: "INV-002",
+    bookingId: "BK-2024-002",
+    customerName: "Bob Martinez",
+    customerEmail: "bob.m@example.com",
+    totalAmount: 1250.00,
+    status: "Pending",
+    createdAt: "2024-12-01T09:00:00Z",
+    updatedAt: "2024-12-01T09:00:00Z",
+    lines: [
+      { id: "L4", name: "Deluxe Suite", serviceType: "Accommodation", unitPrice: 350, amount: 3, lineTotal: 1050 },
+      { id: "L5", name: "Spa Treatment", serviceType: "Wellness", unitPrice: 100, amount: 2, lineTotal: 200 },
+    ],
+  },
+  {
+    id: "INV-003",
+    bookingId: "BK-2024-003",
+    customerName: "Carol Wei",
+    customerEmail: "carol.w@example.com",
+    totalAmount: 89.99,
+    status: "Failed",
+    createdAt: "2024-12-05T16:45:00Z",
+    updatedAt: "2024-12-06T08:20:00Z",
+    lines: [
+      { id: "L6", name: "Conference Room", serviceType: "Business", unitPrice: 89.99, amount: 1, lineTotal: 89.99 },
+    ],
+  },
+  {
+    id: "INV-004",
+    bookingId: "BK-2024-004",
+    customerName: "David Park",
+    customerEmail: "david.p@example.com",
+    totalAmount: 475.50,
+    status: "Pending",
+    createdAt: "2024-12-10T11:15:00Z",
+    updatedAt: "2024-12-10T11:15:00Z",
+    lines: [
+      { id: "L7", name: "Twin Room", serviceType: "Accommodation", unitPrice: 95, amount: 3, lineTotal: 285 },
+      { id: "L8", name: "Dinner Set Menu", serviceType: "Dining", unitPrice: 45, amount: 2, lineTotal: 90 },
+      { id: "L9", name: "Mini Bar", serviceType: "Extras", unitPrice: 33.50, amount: 3, lineTotal: 100.50 },
+    ],
+  },
+  {
+    id: "INV-005",
+    bookingId: "BK-2024-005",
+    customerName: "Emma Clark",
+    customerEmail: "emma.c@example.com",
+    totalAmount: 2100.00,
+    status: "Paid",
+    createdAt: "2024-12-12T08:00:00Z",
+    updatedAt: "2024-12-13T10:30:00Z",
+    lines: [
+      { id: "L10", name: "Presidential Suite", serviceType: "Accommodation", unitPrice: 600, amount: 3, lineTotal: 1800 },
+      { id: "L11", name: "Private Chef", serviceType: "Dining", unitPrice: 150, amount: 2, lineTotal: 300 },
+    ],
+  },
+];
