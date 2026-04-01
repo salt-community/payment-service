@@ -8,7 +8,7 @@ public class EventConsumer(ConsumerConfig consumerConfig, IServiceScopeFactory s
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
-        consumer.Subscribe(new[] { "booking", "workshop" });
+        consumer.Subscribe(new[] { "workshop" }); //"booking",
 
         try
         {

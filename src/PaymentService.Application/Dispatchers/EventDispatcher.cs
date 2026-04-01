@@ -11,6 +11,11 @@ public class EventDispatcher(IPaymentService paymentService) : IEventDispatcher
     {
         try
         {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
             using var doc = JsonDocument.Parse(json);
 
             if (!doc.RootElement.TryGetProperty("eventType", out var typeElement))
@@ -23,12 +28,27 @@ public class EventDispatcher(IPaymentService paymentService) : IEventDispatcher
             if (topic == "booking" && type == "Created")
             {
                 Console.WriteLine("Calling booking created service");
-                var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(doc);
+                Console.WriteLine(doc.RootElement.GetRawText());
+                var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(doc, options);
+                Console.WriteLine(bookingEvent.Customer.Name);
                 await paymentService.HandleBookingCreatedAsync(bookingEvent);
             }
             else if (topic == "workshop")
             {
-                Console.WriteLine("Should call workshop handlers");
+                Console.WriteLine("Calling workshop handlers");
+                if (type == "update")
+                {
+                    Console.WriteLine(doc.RootElement.GetRawText());
+                    var workshopUpdateEvent = JsonSerializer.Deserialize<WorkshopUpdatedEvent>(doc, options);
+                    Console.WriteLine(workshopUpdateEvent.ServiceType);
+                    await paymentService.HandleWorkshopUpdatedAsync(workshopUpdateEvent);
+                }
+                else if (type == "completed")
+                {
+                    var workshopCompletedEvent = JsonSerializer.Deserialize<WorkshopCompletedEvent>(doc, options);
+                    await paymentService.HandleWorkshopCompletedAsync(workshopCompletedEvent);
+                }
+
             }
             else
             {
