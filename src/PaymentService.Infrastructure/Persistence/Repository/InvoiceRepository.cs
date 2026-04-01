@@ -30,7 +30,6 @@ public class InvoiceRepository(PaymentDbContext db) : IInvoiceRepository
     }
     public async Task UpdateAsync(Invoice invoice, CancellationToken ct = default)
     {
-        db.Invoices.Update(invoice);
         await db.SaveChangesAsync(ct);
     }
 
