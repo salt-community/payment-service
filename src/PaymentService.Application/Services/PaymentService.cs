@@ -72,6 +72,7 @@ public class PaymentService : IPaymentService
                 };
 
                 invoice.Lines.Add(newLine);
+                _invoiceRepository.AddInvoiceLine(newLine);
                 existingLinesByName[part.Name] = newLine;
             }
             else
