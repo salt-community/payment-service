@@ -43,16 +43,16 @@ public class PaymentService : IPaymentService
         await _invoiceRepository.AddAsync(invoice, cancellationToken);
     }
 
-    public async Task HandleWorkshopUpdatedAsync(
-        WorkshopInvoiceUpdatedEvent message,
-        CancellationToken cancellationToken = default)
+    public async Task HandleWorkshopInvoiceUpdatedAsync(
+    WorkshopInvoiceUpdatedEvent message,
+    CancellationToken cancellationToken = default)
     {
         var invoice = await _invoiceRepository
             .GetByBookingIdAsync(message.BookingId, cancellationToken);
 
         if (invoice == null)
         {
-            Console.WriteLine($"No invoice found for workshop update. BookingId: {message.BookingId}");
+            Console.WriteLine($"No invoice found for workshop invoice update. BookingId: {message.BookingId}");
             return;
         }
 
@@ -60,14 +60,14 @@ public class PaymentService : IPaymentService
         var unitPrice = message.Product?.Price ?? 0m;
         var quantity = message.Quantity;
 
-        if (productName == null || quantity == 0)
+        if (string.IsNullOrWhiteSpace(productName))
         {
             Console.WriteLine("No product name in workshop invoice update");
             return;
         }
 
         var existingLine = invoice.Lines
-            .FirstOrDefault(x => x.Name == message.Product.Name);
+            .FirstOrDefault(x => x.Name == productName);
 
         if (existingLine == null)
         {
