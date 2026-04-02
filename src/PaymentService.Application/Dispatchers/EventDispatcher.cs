@@ -38,8 +38,8 @@ public class EventDispatcher(IPaymentService paymentService) : IEventDispatcher
                 if (type == "update")
                 {
                     Console.WriteLine(doc.RootElement.GetRawText());
-                    var workshopUpdateEvent = JsonSerializer.Deserialize<WorkshopUpdatedEvent>(doc, options);
-                    await paymentService.HandleWorkshopUpdatedAsync(workshopUpdateEvent);
+                    var workshopUpdateEvent = JsonSerializer.Deserialize<WorkshopInvoiceUpdatedEvent>(doc, options);
+                    await paymentService.HandleWorkshopInvoiceUpdatedAsync(workshopUpdateEvent);
                 }
                 else if (type == "completed")
                 {
