@@ -26,12 +26,18 @@ export default function InvoiceDetailsPage() {
 
   const handlePay = () => {
     if (!id) return;
+
     payMutation.mutate(id, {
       onSuccess: () => {
         toast.success("Payment successful!");
-        navigate("/");
+
+        setTimeout(() => {
+          navigate("/");
+        }, 800);
       },
-      onError: () => toast.error("Payment failed. Please try again."),
+      onError: () => {
+        toast.error("Payment failed. Please try again.");
+      },
     });
   };
 

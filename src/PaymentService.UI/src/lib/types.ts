@@ -1,4 +1,4 @@
-export type PaymentStatus = "Paid" | "Pending" | "Failed";
+export type PaymentStatus = "Paid" | "Invoiced" | "Failed";
 
 export interface InvoiceLine {
   id: string;

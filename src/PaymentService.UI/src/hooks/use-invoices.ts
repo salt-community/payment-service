@@ -17,13 +17,14 @@ const fetchInvoice = async (id: string): Promise<Invoice> => {
   return res.json();
 };
 
-const payInvoice = async (id: string): Promise<string> => {
+const payInvoice = async (id: string): Promise<Invoice> => {
   const res = await fetch(`${API_BASE_URL}/${id}/pay`, {
     method: "POST",
   });
 
   if (!res.ok) throw new Error("Payment failed");
-  return res.json();
+  console.log("Payment response is....", res);
+  return fetchInvoice(id);
 };
 
 export function useInvoices() {
