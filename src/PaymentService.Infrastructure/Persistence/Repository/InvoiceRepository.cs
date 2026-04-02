@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Application.Interfaces;
 using PaymentService.Domain.Entities;
+using PaymentService.Domain.Enums;
 
 namespace PaymentService.Infrastructure.Persistence;
 
@@ -35,8 +36,10 @@ public class InvoiceRepository(PaymentDbContext db) : IInvoiceRepository
 
     public async Task<IEnumerable<Invoice>> GetAllAsync(CancellationToken ct)
     {
-
-        return await db.Invoices.Include(x => x.Lines).ToListAsync(ct);
+        return await db.Invoices
+            .Include(x => x.Lines)
+            .Where(l => l.Status != InvoiceStatus.Pending)
+            .ToListAsync(ct);
     }
 
     public void AddInvoiceLine(InvoiceLine line)
