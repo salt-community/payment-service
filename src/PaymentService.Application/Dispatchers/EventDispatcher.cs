@@ -11,6 +11,12 @@ public class EventDispatcher(IPaymentService paymentService) : IEventDispatcher
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                Console.WriteLine("Empty payload");
+                return;
+            }
+
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -18,39 +24,52 @@ public class EventDispatcher(IPaymentService paymentService) : IEventDispatcher
 
             using var doc = JsonDocument.Parse(json);
 
-            if (!doc.RootElement.TryGetProperty("eventType", out var typeElement))
+            string? type = null;
+            if (doc.RootElement.TryGetProperty("eventType", out var typeElement))
             {
-                Console.WriteLine("No type found in Json");
+                type = typeElement.GetString()?.ToLowerInvariant();
             }
 
-            string type = typeElement.GetString();
-
-            if (topic == "booking" && type == "Created")
+            if (topic == "booking")
             {
-                Console.WriteLine("Calling booking created service");
-                Console.WriteLine(doc.RootElement.GetRawText());
-                var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(doc, options);
-                await paymentService.HandleBookingCreatedAsync(bookingEvent);
-            }
-            else if (topic == "workshop")
-            {
-                Console.WriteLine("Calling workshop handlers");
-                if (type == "update")
+                if (type == "created")
                 {
-                    Console.WriteLine(doc.RootElement.GetRawText());
-                    var workshopUpdateEvent = JsonSerializer.Deserialize<WorkshopUpdatedEvent>(doc, options);
-                    await paymentService.HandleWorkshopUpdatedAsync(workshopUpdateEvent);
+                    var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(json, options);
+                    if (bookingEvent == null) return;
+
+                    Console.WriteLine("Calling booking created service");
+                    await paymentService.HandleBookingCreatedAsync(bookingEvent);
+                    return;
                 }
-                else if (type == "completed")
+
+                Console.WriteLine($"No handler for topic '{topic}' and eventType '{type}'");
+                return;
+            }
+
+            if (topic == "workshop")
+            {
+                if (type == "invoice-updated" || type == "workshop.invoice-updated")
                 {
-                    var workshopCompletedEvent = JsonSerializer.Deserialize<WorkshopCompletedEvent>(doc, options);
+                    var workshopUpdateEvent = JsonSerializer.Deserialize<WorkshopInvoiceUpdatedEvent>(json, options);
+                    if (workshopUpdateEvent == null) return;
+
+                    Console.WriteLine("Calling workshop invoice updated service");
+                    await paymentService.HandleWorkshopInvoiceUpdatedAsync(workshopUpdateEvent);
+                    return;
+                }
+
+                if (type == "completed" || type == "workshop.completed")
+                {
+                    var workshopCompletedEvent = JsonSerializer.Deserialize<WorkshopCompletedEvent>(json, options);
+                    if (workshopCompletedEvent == null) return;
+
+                    Console.WriteLine("Calling workshop completed service");
                     await paymentService.HandleWorkshopCompletedAsync(workshopCompletedEvent);
+                    return;
                 }
 
-            }
-            else
-            {
-                Console.WriteLine("No topic found!");
+                Console.WriteLine($"No handler for topic '{topic}' and eventType '{type}'");
+                return;
             }
         }
         catch (Exception e)

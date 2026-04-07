@@ -43,52 +43,51 @@ public class PaymentService : IPaymentService
         await _invoiceRepository.AddAsync(invoice, cancellationToken);
     }
 
-    public async Task HandleWorkshopUpdatedAsync(
-        WorkshopUpdatedEvent message,
-        CancellationToken cancellationToken = default)
+    public async Task HandleWorkshopInvoiceUpdatedAsync(
+    WorkshopInvoiceUpdatedEvent message,
+    CancellationToken cancellationToken = default)
     {
         var invoice = await _invoiceRepository
             .GetByBookingIdAsync(message.BookingId, cancellationToken);
 
         if (invoice == null)
         {
-            Console.WriteLine($"No invoice found for workshop update. BookingId: {message.BookingId}");
+            Console.WriteLine($"No invoice found for workshop invoice update. BookingId: {message.BookingId}");
             return;
         }
 
-        if (message.Parts == null || message.Parts.Count == 0)
+        var productName = message.Product?.Name;
+        var unitPrice = message.Product?.Price ?? 0m;
+        var quantity = message.Quantity;
+
+        if (string.IsNullOrWhiteSpace(productName))
         {
-            Console.WriteLine("No parts in workshop update");
+            Console.WriteLine("No product name in workshop invoice update");
             return;
         }
 
-        var existingLinesByName = invoice.Lines
-            .Where(x => x.ServiceType == message.ServiceType)
-            .ToDictionary(x => x.Name, x => x);
+        var existingLine = invoice.Lines
+            .FirstOrDefault(x => x.Name == productName);
 
-        foreach (var part in message.Parts)
+        if (existingLine == null)
         {
-            if (!existingLinesByName.TryGetValue(part.Name, out var existingLine))
+            var newLine = new InvoiceLine
             {
-                var newLine = new InvoiceLine
-                {
-                    Id = Guid.NewGuid(),
-                    InvoiceId = invoice.Id,
-                    Name = part.Name,
-                    UnitPrice = part.Price,
-                    Amount = part.Amount,
-                    ServiceType = message.ServiceType
-                };
+                Id = Guid.NewGuid(),
+                InvoiceId = invoice.Id,
+                Name = productName,
+                UnitPrice = unitPrice,
+                Amount = quantity,
+                ServiceType = string.Empty
+            };
 
-                invoice.Lines.Add(newLine);
-                _invoiceRepository.AddInvoiceLine(newLine);
-                existingLinesByName[part.Name] = newLine;
-            }
-            else
-            {
-                existingLine.UnitPrice = part.Price;
-                existingLine.Amount = part.Amount;
-            }
+            invoice.Lines.Add(newLine);
+            _invoiceRepository.AddInvoiceLine(newLine);
+        }
+        else
+        {
+            existingLine.UnitPrice = unitPrice;
+            existingLine.Amount = quantity;
         }
 
         invoice.TotalAmount = invoice.Lines.Sum(x => x.UnitPrice * x.Amount);

@@ -28,7 +28,7 @@ public class EventConsumer(ConsumerConfig consumerConfig, IServiceScopeFactory s
                 }
                 catch (ConsumeException e)
                 {
-                    Console.WriteLine("Consume Error: {Reason}", e.Error.Reason);
+                    Console.WriteLine($"Consume Error: {e.Error.Reason}");
                 }
             }
         }
