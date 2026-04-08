@@ -14,7 +14,7 @@ var builder = Host.CreateApplicationBuilder(args);
 var kafkaSection = builder.Configuration.GetSection("Kafka");
 
 var consumerConfig = kafkaSection.Get<ConsumerConfig>();
-consumerConfig.GroupId = Guid.NewGuid().ToString(); // for development
+// consumerConfig.GroupId = Guid.NewGuid().ToString(); // for development
 builder.Services.AddSingleton(consumerConfig);
 
 var producerConfig = kafkaSection.Get<ProducerConfig>();
